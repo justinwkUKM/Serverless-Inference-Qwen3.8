@@ -37,7 +37,7 @@ Project Stark server · localhost:4173
 
 | Setting | Value |
 |---|---|
-| Model | `unsloth/Qwen3.8-27B-FP8` |
+| Model | `unsloth/Qwen3.8-27B-NVFP4` |
 | Runtime | `vllm/vllm-openai:v0.26.0-cu129-ubuntu2404` |
 | Compute | 1× RTX PRO 6000 On-Demand, 96 GB |
 | Context | 65,536 tokens |

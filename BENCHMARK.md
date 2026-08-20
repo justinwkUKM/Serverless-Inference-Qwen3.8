@@ -3,8 +3,8 @@
 ## Test configuration
 
 > These are historical RTX PRO 6000/NVFP4 measurements. The selected deployment
-> uses an RTX PRO 6000 On-Demand GPU and `unsloth/Qwen3.8-27B-FP8`; benchmark results
-> should not be treated as measurements of the FP8 configuration.
+> uses an RTX PRO 6000 On-Demand GPU and `unsloth/Qwen3.8-27B-NVFP4`.
+> These historical results predate the current On-Demand deployment attempt.
 
 Measurements were collected on 20 August 2026 (Malaysia time) against:
 
