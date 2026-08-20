@@ -29,7 +29,7 @@ async function waitForServer(url) {
     }
     await new Promise(resolve => setTimeout(resolve, 50));
   }
-  throw new Error("Project Stark test server did not start");
+  throw new Error("Quicksilver test server did not start");
 }
 
 before(async () => {

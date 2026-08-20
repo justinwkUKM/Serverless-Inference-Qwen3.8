@@ -1,9 +1,9 @@
-# Project Stark
+# Quicksilver
 
 Private, OpenAI-compatible inference on Verda Serverless with Qwen3.8, vLLM,
 streaming Markdown, performance telemetry, and optional Tavily web grounding.
 
-Project Stark combines reproducible Terraform infrastructure with a lightweight
+Quicksilver combines reproducible Terraform infrastructure with a lightweight
 local chat console. Secrets remain in the server process: the browser never
 receives the Verda inference key, infrastructure credentials, or Tavily key.
 
@@ -24,7 +24,7 @@ receives the Verda inference key, infrastructure credentials, or Tavily key.
 Browser
   │  prompts and streamed SSE (no provider credentials)
   ▼
-Project Stark server · localhost:4173
+Quicksilver server · localhost:4173
   ├── optional Tavily Search
   └── authenticated Verda inference proxy
           ▼
@@ -163,7 +163,7 @@ python3 tests/benchmark_endpoint.py --runs 4 --max-tokens 256
 python3 tests/benchmark_concurrency.py --concurrency 4 --max-tokens 256
 ```
 
-With Project Stark running, validate the complete web-grounded flow:
+With Quicksilver running, validate the complete web-grounded flow:
 
 ```bash
 node tests/test_web_search.mjs

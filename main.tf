@@ -29,7 +29,7 @@ resource "verda_container" "qwen38" {
   containers = [
     {
       # Pin a versioned x86_64 CUDA 12.9 image. Verda rejects moving tags.
-      image        = "docker.io/vllm/vllm-openai:v0.26.0-cu129-ubuntu2404"
+      image        = "vllm/vllm-openai:v0.26.0-cu129-ubuntu2404"
       exposed_port = 8000
 
       entrypoint_overrides = {

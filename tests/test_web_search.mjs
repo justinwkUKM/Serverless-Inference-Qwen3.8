@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const endpoint = process.env.STARK_ENDPOINT || "http://127.0.0.1:4173";
+const endpoint = process.env.QUICKSILVER_ENDPOINT || process.env.STARK_ENDPOINT || "http://127.0.0.1:4173";
 const cases = [
   {
     name: "current fact",

@@ -161,6 +161,6 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(port, host, () => {
-  console.log(`Project Stark: http://${host}:${port}`);
+  console.log(`Quicksilver: http://${host}:${port}`);
   console.log(`Model: ${model} · Key: ${inferenceKey ? "configured" : "missing"}`);
 });
