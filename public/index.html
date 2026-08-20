@@ -8,10 +8,20 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+  <div class="tetris-world" id="tetrisWorld" aria-hidden="true"><div class="tetris-grid"></div><div class="tetris-pieces" id="tetrisPieces"></div><div class="tetris-vignette"></div></div>
   <div class="shell">
+    <aside class="chat-sidebar" id="chatSidebar" aria-label="Conversation history">
+      <div class="sidebar-head"><div class="sidebar-brand"><span class="mark">Q</span><strong>Quicksilver</strong></div><button class="sidebar-collapse" id="collapseSidebar" aria-label="Collapse sidebar" title="Collapse sidebar">‹</button></div>
+      <button class="sidebar-new" id="sidebarNewChat">＋ <span>New chat</span></button>
+      <nav class="chat-list" id="chatList" aria-label="Saved chats"></nav>
+      <p class="sidebar-storage">Stored locally in SQLite</p>
+    </aside>
+    <button class="sidebar-open" id="openSidebar" aria-label="Open conversation sidebar" title="Open conversations">☰</button>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+    <div class="workspace">
     <header>
       <div class="brand"><span class="mark">Q</span><div><strong>Quicksilver</strong><span>Inference workspace</span></div><span class="preview-badge">LAB</span></div>
-      <div class="status unchecked" id="healthBadge"><i></i><span>Unchecked</span></div>
+      <div class="header-actions"><button class="new-chat" id="newChatButton">＋ New chat</button><div class="status unchecked" id="healthBadge"><i></i><span>Unchecked</span></div></div>
     </header>
 
     <main>
@@ -43,30 +53,45 @@
 
     <footer>
       <div class="composer">
-        <textarea id="prompt" rows="1" placeholder="Message Qwen3.8…" autofocus></textarea>
+        <div class="attachment-tray" id="attachmentTray"></div>
+        <textarea id="prompt" rows="1" dir="auto" placeholder="Message Qwen3.8…" autofocus></textarea>
         <div class="composer-row">
           <div class="options">
-            <button class="icon-button" id="healthButton" title="Check endpoint health">⌁ <span>Health</span></button>
-            <button class="pill web-toggle" id="webSearchButton" aria-pressed="false" title="Ground the answer with Tavily web results">◎ Web</button>
-            <button class="pill" id="coldButton" title="Run a request intended to measure scale-from-zero latency">Cold test</button>
-            <button class="pill" id="warmButton" title="Run an immediate benchmark request">Warm test</button>
+            <input id="attachmentInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,application/pdf,text/plain,text/markdown,text/csv,.pdf,.txt,.md,.csv" multiple hidden>
+            <div class="tool-menu" id="toolMenu">
+              <button class="tool-trigger" id="toolTrigger" aria-label="Open chat options" aria-expanded="false">＋</button>
+              <div class="tool-popover" role="menu">
+                <button id="attachButton" role="menuitem"><span>▧</span><div><strong>Attach files</strong><small>Images, PDF, TXT, Markdown or CSV</small></div></button>
+                <button id="webSearchButton" class="web-toggle" aria-pressed="false" role="menuitem"><span>◎</span><div><strong>Web search</strong><small>Ground with Tavily results</small></div></button>
+                <button id="historyButton" class="active" aria-pressed="true" role="menuitem"><span>◴</span><div><strong>Chat history</strong><small id="historyStatus">Saving and context enabled</small></div></button>
+                <div class="tool-separator"></div>
+                <button id="healthButton" role="menuitem"><span>⌁</span><div><strong>Endpoint health</strong><small>Check readiness</small></div></button>
+                <button id="coldButton" role="menuitem"><span>❄</span><div><strong>Cold test</strong><small>Measure scale from zero</small></div></button>
+                <button id="warmButton" role="menuitem"><span>↗</span><div><strong>Warm test</strong><small>Benchmark the active replica</small></div></button>
+                <button id="menuSettingsButton" role="menuitem"><span>⚙</span><div><strong>Settings</strong><small>Generation controls</small></div></button>
+              </div>
+            </div>
           </div>
           <button class="send" id="sendButton" aria-label="Send"><span>↑</span></button>
         </div>
       </div>
-      <p class="footnote"><span id="modelName">qwen3.8-27b</span> · Built with ❤️ in Kuala Lumpur · <button id="settingsButton">Settings</button></p>
+      <p class="footnote"><span id="modelName">qwen3.8-27b</span> · Built with ❤️ in Kuala Lumpur</p>
     </footer>
+    </div>
   </div>
+  <button class="scroll-bottom" id="scrollBottom" aria-label="Scroll to latest message" title="Scroll to latest message">↓</button>
 
   <dialog id="settingsDialog">
     <form method="dialog">
       <div class="dialog-head"><h2>Generation settings</h2><button value="cancel">×</button></div>
-      <label>Maximum output tokens <output id="maxTokensValue">1024</output><input id="maxTokens" type="range" min="64" max="4096" step="64" value="1024"></label>
+      <label>Maximum output tokens <output id="maxTokensValue">20480</output><input id="maxTokens" type="range" min="256" max="20480" step="256" value="20480"></label>
       <label>Temperature <output id="temperatureValue">0.3</output><input id="temperature" type="range" min="0" max="2" step="0.1" value="0.3"></label>
       <label class="toggle"><span><strong>Reasoning</strong><small>Show the model's thinking stream</small></span><input id="thinking" type="checkbox"></label>
       <button class="done" value="default">Done</button>
     </form>
   </dialog>
+  <script src="/vendor/marked.umd.js"></script>
+  <script src="/vendor/purify.min.js"></script>
   <script type="module" src="/app.js"></script>
 </body>
 </html>

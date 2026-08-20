@@ -10,6 +10,10 @@ __pycache__/
 !.env.example
 scripts/env.sh
 node_modules/
+data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
 .DS_Store
 crash.log
 .commandcode/

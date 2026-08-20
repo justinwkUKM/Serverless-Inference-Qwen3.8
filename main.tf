@@ -52,6 +52,8 @@ resource "verda_container" "qwen38" {
           "16384",
           "--reasoning-parser",
           "qwen3",
+          "--default-chat-template-kwargs",
+          jsonencode({ enable_thinking = false }),
           "--enable-auto-tool-choice",
           "--tool-call-parser",
           "qwen3_coder"

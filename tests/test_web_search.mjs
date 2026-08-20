@@ -19,7 +19,9 @@ async function run(testCase) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       messages: [{ role: "user", content: testCase.prompt }],
-      max_tokens: 256,
+      // Leave enough room for the answer and its source URLs. A 256-token cap
+      // can truncate a correct answer before the citations are emitted.
+      max_tokens: 512,
       temperature: 0,
       enable_thinking: false,
       web_search: true,
@@ -64,14 +66,17 @@ async function run(testCase) {
   }
 
   const finished = performance.now();
-  const citedUrls = sources.filter(source => answer.includes(source.url));
+  const citedSources = sources.filter(source => {
+    const numberedCitation = new RegExp(`\\[${source.id}\\](?:\\([^)]*\\))?`);
+    return answer.includes(source.url) || numberedCitation.test(answer);
+  });
   const completionTokens = usage.completion_tokens || 0;
   const generationMs = Math.max(1, finished - firstTokenAt);
   const result = {
     name: testCase.name,
-    passed: Boolean(firstTokenAt && sawDone && sources.length && citedUrls.length),
+    passed: Boolean(firstTokenAt && sawDone && sources.length && citedSources.length),
     sources: sources.length,
-    cited_sources: citedUrls.length,
+    cited_sources: citedSources.length,
     search_seconds: Number((searchMs / 1000).toFixed(3)),
     ttft_seconds: Number(((firstTokenAt - started) / 1000).toFixed(3)),
     total_seconds: Number(((finished - started) / 1000).toFixed(3)),
