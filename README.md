@@ -9,7 +9,7 @@ receives the Verda inference key, infrastructure credentials, or Tavily key.
 
 ## Highlights
 
-- Qwen3.8 27B NVFP4 served through vLLM's OpenAI-compatible API
+- Qwen3.8 27B FP8 served through vLLM's OpenAI-compatible API
 - Streaming Markdown chat with automatic scrolling and a responsive dark UI
 - Client-observed TTFT, total latency, token usage, and decode throughput
 - Manual health checks plus comparable warm and cold-test controls
@@ -30,16 +30,16 @@ Project Stark server · localhost:4173
           ▼
       Verda Serverless
           ▼
-      vLLM + Qwen3.8 27B NVFP4
+      vLLM + Qwen3.8 27B FP8
 ```
 
 ## Deployment profile
 
 | Setting | Value |
 |---|---|
-| Model | `unsloth/Qwen3.8-27B-NVFP4` |
+| Model | `unsloth/Qwen3.8-27B-FP8` |
 | Runtime | `vllm/vllm-openai:v0.26.0-x86_64-cu129-ubuntu2404` |
-| GPU | 1× RTX PRO 6000, 96 GB |
+| Compute | 1× H200 SXM5 Spot, 141 GB |
 | Context | 65,536 tokens |
 | KV cache | FP8 |
 | Prefix caching | Enabled |
@@ -48,7 +48,8 @@ Project Stark server · localhost:4173
 | Scale-down delay | 300 seconds |
 
 The image uses a versioned tag because Verda does not accept moving tags such
-as `latest`. Capacity and pricing depend on the selected Verda compute market.
+as `latest`. The H200 Spot configuration was listed at $2.20/GPU-hour when
+selected; actual capacity and pricing depend on Verda's current compute market.
 
 ## Prerequisites
 

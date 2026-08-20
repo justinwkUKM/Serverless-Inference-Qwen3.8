@@ -7,13 +7,13 @@ variable "deployment_name" {
 variable "model_id" {
   type        = string
   description = "Hugging Face model repository"
-  default     = "unsloth/Qwen3.8-27B-NVFP4"
+  default     = "unsloth/Qwen3.8-27B-FP8"
 }
 
 variable "gpu_type" {
   type        = string
   description = "Verda Serverless GPU identifier"
-  default     = "RTX PRO 6000"
+  default     = "H200"
 }
 
 variable "max_model_len" {
