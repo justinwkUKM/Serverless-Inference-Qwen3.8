@@ -2,9 +2,9 @@
 
 ## Test configuration
 
-> These are historical RTX PRO 6000/NVFP4 measurements. The current deployment
-> uses an H200 SXM5 Spot GPU and `unsloth/Qwen3.8-27B-FP8`; benchmark results
-> should not be treated as measurements of the new H200 configuration.
+> These are historical RTX PRO 6000/NVFP4 measurements. The selected deployment
+> uses an RTX PRO 6000 Spot GPU and `unsloth/Qwen3.8-27B-FP8`; benchmark results
+> should not be treated as measurements of the FP8 configuration.
 
 Measurements were collected on 20 August 2026 (Malaysia time) against:
 

@@ -13,7 +13,7 @@ variable "model_id" {
 variable "gpu_type" {
   type        = string
   description = "Verda Serverless GPU identifier"
-  default     = "H200"
+  default     = "RTX PRO 6000"
 }
 
 variable "max_model_len" {

@@ -39,7 +39,7 @@ Project Stark server · localhost:4173
 |---|---|
 | Model | `unsloth/Qwen3.8-27B-FP8` |
 | Runtime | `vllm/vllm-openai:v0.26.0-cu129-ubuntu2404` |
-| Compute | 1× H200 SXM5 Spot, 141 GB |
+| Compute | 1× RTX PRO 6000 Spot, 96 GB |
 | Context | 65,536 tokens |
 | KV cache | FP8 |
 | Prefix caching | Enabled |
@@ -48,7 +48,7 @@ Project Stark server · localhost:4173
 | Scale-down delay | 300 seconds |
 
 The image uses a versioned tag because Verda does not accept moving tags such
-as `latest`. The H200 Spot configuration was listed at $2.20/GPU-hour when
+as `latest`. The RTX PRO 6000 Spot configuration was listed at $1.04/GPU-hour when
 selected; actual capacity and pricing depend on Verda's current compute market.
 
 ## Prerequisites
