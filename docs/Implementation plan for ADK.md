@@ -52,7 +52,7 @@ Use Python because Google's current ADK tooling, templates, evaluations, and per
   - Use `quicksilver-local` as the initial `user_id`.
   - Keep ADK tables separate from the current UI database.
 - Add a `before_model_callback` context-budget guard:
-  - Target the configured 65,536-token model context.
+  - Target the configured 32,768-token model context.
   - Reserve requested output tokens plus a 2,048-token safety margin.
   - Preserve system instructions, tool definitions, and newest user turn.
   - Remove oldest conversational events first.

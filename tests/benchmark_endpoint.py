@@ -147,7 +147,7 @@ def main() -> None:
         "measured_at": datetime.now(timezone.utc).isoformat(),
         "endpoint": endpoint,
         "model": "qwen3.8-27b",
-        "max_model_len": 65536,
+        "max_model_len": 32768,
         "runs": len(results),
         "prewarm_required_for_comparable_warm_results": True,
         "runs_summarized": len(warm),

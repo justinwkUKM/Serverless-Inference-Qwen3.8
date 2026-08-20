@@ -15,7 +15,7 @@ Measurements were collected on 20 August 2026 (Malaysia time) against:
 | Served name | `qwen3.8-27b` |
 | vLLM | `v0.26.0`, CUDA 12.9 image |
 | GPU | 1x RTX PRO 6000 Blackwell, 96 GB |
-| Context limit | 131,072 tokens at benchmark time; 65,536 currently |
+| Context limit | 131,072 tokens at benchmark time; 32,768 currently |
 | KV cache | FP8 |
 | GPU memory utilization | 90% |
 | Replica range | 0–1 |

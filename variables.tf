@@ -19,7 +19,7 @@ variable "gpu_type" {
 variable "max_model_len" {
   type        = number
   description = "Maximum model context window"
-  default     = 65536
+  default     = 32768
 }
 
 variable "max_replicas" {

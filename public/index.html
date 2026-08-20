@@ -21,22 +21,59 @@
     <div class="workspace">
     <header>
       <div class="brand"><span class="mark">Q</span><div><strong>Quicksilver</strong><span>Inference workspace</span></div><span class="preview-badge">LAB</span></div>
-      <div class="header-actions"><button class="new-chat" id="newChatButton">＋ New chat</button><div class="status unchecked" id="healthBadge"><i></i><span>Unchecked</span></div></div>
+      <div class="header-actions"><div class="mode-switch" role="group" aria-label="Workspace mode"><button id="chatModeButton" class="active" aria-pressed="true">Chat</button><button id="concurrencyModeButton" aria-pressed="false">Concurrency 4</button></div><button class="new-chat" id="newChatButton">＋ New chat</button><details class="endpoint-menu" id="endpointMenu"><summary aria-label="Endpoint controls"><span class="status unchecked" id="healthBadge"><i></i><span>Unchecked</span></span><b>⌄</b></summary><div class="endpoint-popover"><span class="endpoint-label">Endpoint operations</span><button id="healthButton"><span>⌁</span><div><strong>Check health</strong><small>Verify endpoint readiness</small></div></button><button id="warmButton"><span>↗</span><div><strong>Warm test</strong><small>Benchmark the active replica</small></div></button><button id="coldButton"><span>❄</span><div><strong>Cold test</strong><small>Measure scale from zero</small></div></button></div></details></div>
     </header>
 
-    <main>
+    <main id="chatMain">
       <section class="hero" id="emptyState">
         <div class="eyebrow"><i></i> Private inference environment</div>
         <div class="orb"><span>✦</span></div>
         <h1>Build at the speed<br><em>of thought.</em></h1>
         <p>Qwen3.8 27B · private, streamed, observable</p>
         <div class="quick-actions">
-          <button data-prompt="Create a clean TypeScript utility that retries async operations with exponential backoff."><span>01</span> Write code</button>
-          <button data-prompt="Explain how prefix caching improves LLM inference performance, with a concise example."><span>02</span> Explain a concept</button>
-          <button data-prompt="Review this architecture: browser → authenticated proxy → vLLM endpoint. List the top security considerations."><span>03</span> Review architecture</button>
+          <button title="Create a TypeScript retry utility with exponential backoff" data-prompt="Create a clean TypeScript utility that retries async operations with exponential backoff."><span>01</span> Write code</button>
+          <button title="Explain prefix caching with a concise example" data-prompt="Explain how prefix caching improves LLM inference performance, with a concise example."><span>02</span> Explain caching</button>
+          <button title="Review browser, proxy, and vLLM security" data-prompt="Review this architecture: browser → authenticated proxy → vLLM endpoint. List the top security considerations."><span>03</span> Review security</button>
+          <button title="Explore Malaysia and write a 500-word poem" data-prompt="What is the capital of Malaysia? How many states are there in Malaysia? What is the national anthem? Then write a 500-word poem celebrating Malaysia."><span>04</span> Explore Malaysia</button>
+          <button title="Build a production-ready FastAPI application" data-prompt="Write a production-ready FastAPI app with a health endpoint, request validation, structured error handling, and clear instructions for running it locally."><span>05</span> Build FastAPI</button>
         </div>
       </section>
       <section class="messages" id="messages" aria-live="polite"></section>
+    </main>
+
+    <main class="concurrency-workspace" id="concurrencyWorkspace" hidden>
+      <section class="concurrency-head">
+        <div><span class="eyebrow"><i></i> Parallel inference lab</span><h1>One prompt. Four streams.</h1><p>Send the exact same request to four workers and compare latency and throughput.</p></div>
+        <div class="concurrency-health"><span class="endpoint-state-copy">Live endpoint status is shown in the header.</span></div>
+      </section>
+      <section class="concurrency-summary" id="concurrencySummary" aria-live="polite">
+        <div><small>Completed</small><strong id="concurrencyCompleted">0 / 4</strong></div>
+        <div><small>Wall time</small><strong id="concurrencyWall">—</strong></div>
+        <div><small>Mean TTFT</small><strong id="concurrencyMeanTtft">—</strong></div>
+        <div><small>P95 TTFT</small><strong id="concurrencyP95Ttft">—</strong></div>
+        <div><small>Aggregate output</small><strong id="concurrencyAggregateTps">—</strong></div>
+        <div><small>Tokens / failures</small><strong id="concurrencyTokens">—</strong></div>
+      </section>
+      <section class="concurrency-composer">
+        <div class="concurrency-prompt-wrap">
+          <textarea id="concurrencyPrompt" rows="2" dir="auto" placeholder="Enter one prompt to run in all four windows…"></textarea>
+          <div class="concurrency-prompts" aria-label="Concurrency prompt suggestions">
+            <button data-concurrency-prompt="What is the capital of Malaysia? How many states are there in Malaysia? What is the national anthem? Then write a 500-word poem celebrating Malaysia.">Explore Malaysia</button>
+            <button data-concurrency-prompt="Write a production-ready FastAPI app with a health endpoint, request validation, structured error handling, and clear instructions for running it locally.">Build a FastAPI app</button>
+          </div>
+        </div>
+        <div class="concurrency-controls">
+          <label>Output tokens <output id="concurrencyMaxTokensValue">512</output><input id="concurrencyMaxTokens" type="range" min="128" max="4096" step="128" value="512"></label>
+          <label>Temperature <output id="concurrencyTemperatureValue">0.3</output><input id="concurrencyTemperature" type="range" min="0" max="2" step="0.1" value="0.3"></label>
+          <label class="concurrency-toggle"><input id="concurrencyReasoning" type="checkbox"><span>Reasoning</span></label>
+          <div class="concurrency-actions"><button class="stop-all" id="concurrencyStopAll" disabled>■ Stop all</button><button class="run-four" id="concurrencyRun">Run 4 requests</button></div>
+        </div>
+      </section>
+      <section class="worker-grid" id="concurrencyWorkers" aria-label="Concurrent inference responses"></section>
+      <nav class="worker-mobile-nav" aria-label="Concurrency workers"><button id="workerPrevious" aria-label="Previous worker" title="Previous worker">‹</button><span id="workerPosition">Worker 1 of 4</span><button id="workerNext" aria-label="Next worker" title="Next worker">›</button></nav>
+      <footer class="concurrency-footer">
+        <p class="footnote"><span>qwen3.8-27b</span> · Built with ❤️ in Kuala Lumpur by <a href="https://waqasobeidy.com" target="_blank" rel="noreferrer noopener">waqasobeidy.com</a></p>
+      </footer>
     </main>
 
     <aside class="metrics" id="metricsPanel">
@@ -48,10 +85,10 @@
         <div><label>Tokens</label><strong id="tokens">—</strong></div>
       </div>
       <div class="timeline"><span id="timelineFill"></span></div>
-      <p id="metricsNote">Metrics appear after your first streamed request.</p>
+      <details class="metrics-details"><summary>Timing details</summary><p id="metricsNote">Metrics appear after your first streamed request.</p></details>
     </aside>
 
-    <footer>
+    <footer id="chatFooter">
       <div class="composer">
         <div class="attachment-tray" id="attachmentTray"></div>
         <textarea id="prompt" rows="1" dir="auto" placeholder="Message Qwen3.8…" autofocus></textarea>
@@ -59,35 +96,50 @@
           <div class="options">
             <input id="attachmentInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,application/pdf,text/plain,text/markdown,text/csv,.pdf,.txt,.md,.csv" multiple hidden>
             <div class="tool-menu" id="toolMenu">
-              <button class="tool-trigger" id="toolTrigger" aria-label="Open chat options" aria-expanded="false">＋</button>
+              <button class="tool-trigger" id="toolTrigger" aria-label="Open chat options" aria-expanded="false" title="Chat tools"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
               <div class="tool-popover" role="menu">
                 <button id="attachButton" role="menuitem"><span>▧</span><div><strong>Attach files</strong><small>Images, PDF, TXT, Markdown or CSV</small></div></button>
                 <button id="webSearchButton" class="web-toggle" aria-pressed="false" role="menuitem"><span>◎</span><div><strong>Web search</strong><small>Ground with Tavily results</small></div></button>
                 <button id="historyButton" class="active" aria-pressed="true" role="menuitem"><span>◴</span><div><strong>Chat history</strong><small id="historyStatus">Saving and context enabled</small></div></button>
                 <div class="tool-separator"></div>
-                <button id="healthButton" role="menuitem"><span>⌁</span><div><strong>Endpoint health</strong><small>Check readiness</small></div></button>
-                <button id="coldButton" role="menuitem"><span>❄</span><div><strong>Cold test</strong><small>Measure scale from zero</small></div></button>
-                <button id="warmButton" role="menuitem"><span>↗</span><div><strong>Warm test</strong><small>Benchmark the active replica</small></div></button>
                 <button id="menuSettingsButton" role="menuitem"><span>⚙</span><div><strong>Settings</strong><small>Generation controls</small></div></button>
               </div>
             </div>
           </div>
-          <button class="send" id="sendButton" aria-label="Send"><span>↑</span></button>
+          <button class="send" id="sendButton" aria-label="Send" title="Send message"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 7-7 7 7M12 5v14"/></svg></button>
         </div>
       </div>
-      <p class="footnote"><span id="modelName">qwen3.8-27b</span> · Built with ❤️ in Kuala Lumpur</p>
+      <p class="footnote"><span id="modelName">qwen3.8-27b</span> · Built with ❤️ in Kuala Lumpur by <a href="https://waqasobeidy.com" target="_blank" rel="noreferrer noopener">waqasobeidy.com</a></p>
     </footer>
     </div>
   </div>
-  <button class="scroll-bottom" id="scrollBottom" aria-label="Scroll to latest message" title="Scroll to latest message">↓</button>
+  <button class="scroll-bottom" id="scrollBottom" aria-label="Scroll to latest message" title="Scroll to latest message"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></button>
 
   <dialog id="settingsDialog">
     <form method="dialog">
       <div class="dialog-head"><h2>Generation settings</h2><button value="cancel">×</button></div>
-      <label>Maximum output tokens <output id="maxTokensValue">20480</output><input id="maxTokens" type="range" min="256" max="20480" step="256" value="20480"></label>
+      <label>Maximum output tokens <output id="maxTokensValue">4096</output><input id="maxTokens" type="range" min="256" max="20480" step="256" value="4096"></label>
+      <p class="context-budget" id="contextBudget">32,768 total · up to 28,672 tokens remain for prompt and history</p>
       <label>Temperature <output id="temperatureValue">0.3</output><input id="temperature" type="range" min="0" max="2" step="0.1" value="0.3"></label>
       <label class="toggle"><span><strong>Reasoning</strong><small>Show the model's thinking stream</small></span><input id="thinking" type="checkbox"></label>
       <button class="done" value="default">Done</button>
+    </form>
+  </dialog>
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+  <div class="sr-only" id="statusAnnouncements" aria-live="polite" aria-atomic="true"></div>
+  <dialog class="quicksilver-alert" id="quicksilverAlert" aria-labelledby="alertTitle" aria-describedby="alertMessage">
+    <form method="dialog">
+      <div class="alert-symbol" id="alertSymbol" aria-hidden="true">✦</div>
+      <div class="alert-copy">
+        <span class="alert-eyebrow" id="alertEyebrow">Quicksilver</span>
+        <h2 id="alertTitle">Notice</h2>
+        <p id="alertMessage"></p>
+        <input id="alertInput" type="text" autocomplete="off" hidden>
+      </div>
+      <div class="alert-actions">
+        <button class="alert-cancel" id="alertCancel" type="button">Cancel</button>
+        <button class="alert-confirm" id="alertConfirm" type="button">Continue</button>
+      </div>
     </form>
   </dialog>
   <script src="/vendor/marked.umd.js"></script>

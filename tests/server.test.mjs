@@ -11,6 +11,7 @@ let lastSearchRequest;
 let persistedChatId;
 let upstreamCancelled;
 let resolveUpstreamCancelled;
+let parallelRequests = [];
 
 function listen(server) {
   return new Promise((resolve, reject) => {
@@ -61,6 +62,18 @@ before(async () => {
         headers: req.headers,
         body: JSON.parse(Buffer.concat(chunks).toString("utf8")),
       };
+      if (lastChatRequest.body.messages.at(-1)?.content === "parallel-same-prompt") {
+        parallelRequests.push({ body: lastChatRequest.body, res });
+        if (parallelRequests.length === 4) {
+          for (const request of parallelRequests) {
+            request.res.writeHead(200, { "Content-Type": "text/event-stream" });
+            request.res.write('data: {"choices":[{"delta":{"content":"Parallel"}}]}\n\n');
+            request.res.write('data: {"usage":{"prompt_tokens":8,"completion_tokens":2},"choices":[]}\n\n');
+            request.res.end("data: [DONE]\n\n");
+          }
+        }
+        return;
+      }
       res.writeHead(200, { "Content-Type": "text/event-stream" });
       if (lastChatRequest.body.messages.at(-1)?.content === "cancel-stream") {
         res.write('data: {"choices":[{"delta":{"content":"Partial"}}]}\n\n');
@@ -334,6 +347,32 @@ test("web search expands terse follow-ups with conversational context", async ()
   assert.doesNotMatch(lastSearchRequest.query, /^try again$/i);
   assert.match(stream, /Cities and towns in Malaysia/);
   assert.match(lastChatRequest.body.messages[1].content, /exact form \[1\]\(URL\)/);
+});
+
+test("four identical ephemeral concurrency requests run in parallel without SQLite writes", async () => {
+  parallelRequests = [];
+  const payload = {
+    request_kind: "concurrency",
+    history_enabled: false,
+    messages: [{ role: "user", content: "parallel-same-prompt" }],
+    max_tokens: 512,
+    temperature: 0.3,
+    enable_thinking: false,
+    web_search: false,
+  };
+  const responses = await Promise.all(Array.from({ length: 4 }, () => fetch(`${baseUrl}/api/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  })));
+  assert.equal(parallelRequests.length, 4);
+  assert.ok(responses.every(response => response.status === 200));
+  assert.ok(parallelRequests.every(request => request.body.messages.at(-1).content === "parallel-same-prompt"));
+  assert.ok(parallelRequests.every(request => request.body.max_tokens === 512 && request.body.temperature === 0.3));
+  const streams = await Promise.all(responses.map(response => response.text()));
+  assert.ok(streams.every(stream => /Parallel/.test(stream)));
+  const chatIds = streams.map(stream => JSON.parse(stream.split("\n").find(line => line.includes('"chat_id"')).slice(6)).chat_id);
+  for (const chatId of chatIds) assert.equal((await fetch(`${baseUrl}/api/chats/${chatId}`)).status, 404);
 });
 
 test("completed chats, messages, and inference metrics are persisted", async () => {
