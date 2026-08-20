@@ -144,6 +144,16 @@ instructions to reduce prompt-injection risk.
 
 ## Testing and benchmarks
 
+Run the dependency-free local test suite first. It starts a mock Verda upstream
+and verifies credential isolation, health proxying, two-message history,
+parameter limits, authentication, and SSE streaming without consuming credits:
+
+```bash
+npm test
+```
+
+Run live endpoint tests only after the deployment reports healthy:
+
 ```bash
 source scripts/env.sh
 export VERDA_ENDPOINT="$(terraform output -raw endpoint_base_url)"
