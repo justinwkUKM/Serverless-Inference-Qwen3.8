@@ -82,5 +82,5 @@ resource "verda_container" "qwen38" {
     }
   ]
 
-  is_spot = true
+  is_spot = false
 }

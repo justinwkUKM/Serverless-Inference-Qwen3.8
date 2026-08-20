@@ -10,19 +10,20 @@
 <body>
   <div class="shell">
     <header>
-      <div class="brand"><span class="mark">S</span><div><strong>Project Stark</strong><span>AI inference console</span></div></div>
+      <div class="brand"><span class="mark">S</span><div><strong>Project Stark</strong><span>Inference workspace</span></div><span class="preview-badge">LAB</span></div>
       <div class="status unchecked" id="healthBadge"><i></i><span>Unchecked</span></div>
     </header>
 
     <main>
       <section class="hero" id="emptyState">
+        <div class="eyebrow"><i></i> Private inference environment</div>
         <div class="orb"><span>✦</span></div>
-        <h1>What can I help you build?</h1>
-        <p>Qwen3.8 27B on your private Verda endpoint</p>
+        <h1>Build at the speed<br><em>of thought.</em></h1>
+        <p>Qwen3.8 27B · private, streamed, observable</p>
         <div class="quick-actions">
-          <button data-prompt="Create a clean TypeScript utility that retries async operations with exponential backoff.">Write code</button>
-          <button data-prompt="Explain how prefix caching improves LLM inference performance, with a concise example.">Explain a concept</button>
-          <button data-prompt="Review this architecture: browser → authenticated proxy → vLLM endpoint. List the top security considerations.">Review architecture</button>
+          <button data-prompt="Create a clean TypeScript utility that retries async operations with exponential backoff."><span>01</span> Write code</button>
+          <button data-prompt="Explain how prefix caching improves LLM inference performance, with a concise example."><span>02</span> Explain a concept</button>
+          <button data-prompt="Review this architecture: browser → authenticated proxy → vLLM endpoint. List the top security considerations."><span>03</span> Review architecture</button>
         </div>
       </section>
       <section class="messages" id="messages" aria-live="polite"></section>
