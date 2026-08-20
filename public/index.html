@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <title>Project Stark · AI Console</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><span class="mark">S</span><div><strong>Project Stark</strong><span>AI inference console</span></div></div>
+      <div class="status unchecked" id="healthBadge"><i></i><span>Unchecked</span></div>
+    </header>
+
+    <main>
+      <section class="hero" id="emptyState">
+        <div class="orb"><span>✦</span></div>
+        <h1>What can I help you build?</h1>
+        <p>Qwen3.8 27B on your private Verda endpoint</p>
+        <div class="quick-actions">
+          <button data-prompt="Create a clean TypeScript utility that retries async operations with exponential backoff.">Write code</button>
+          <button data-prompt="Explain how prefix caching improves LLM inference performance, with a concise example.">Explain a concept</button>
+          <button data-prompt="Review this architecture: browser → authenticated proxy → vLLM endpoint. List the top security considerations.">Review architecture</button>
+        </div>
+      </section>
+      <section class="messages" id="messages" aria-live="polite"></section>
+    </main>
+
+    <aside class="metrics" id="metricsPanel">
+      <div class="metrics-head"><span>Last request</span><span id="requestKind">—</span></div>
+      <div class="metric-grid">
+        <div><label>TTFT</label><strong id="ttft">—</strong></div>
+        <div><label>Output</label><strong id="tps">—</strong></div>
+        <div><label>Total time</label><strong id="totalTime">—</strong></div>
+        <div><label>Tokens</label><strong id="tokens">—</strong></div>
+      </div>
+      <div class="timeline"><span id="timelineFill"></span></div>
+      <p id="metricsNote">Metrics appear after your first streamed request.</p>
+    </aside>
+
+    <footer>
+      <div class="composer">
+        <textarea id="prompt" rows="1" placeholder="Message Qwen3.8…" autofocus></textarea>
+        <div class="composer-row">
+          <div class="options">
+            <button class="icon-button" id="healthButton" title="Check endpoint health">⌁ <span>Health</span></button>
+            <button class="pill web-toggle" id="webSearchButton" aria-pressed="false" title="Ground the answer with Tavily web results">◎ Web</button>
+            <button class="pill" id="coldButton" title="Run a request intended to measure scale-from-zero latency">Cold test</button>
+            <button class="pill" id="warmButton" title="Run an immediate benchmark request">Warm test</button>
+          </div>
+          <button class="send" id="sendButton" aria-label="Send"><span>↑</span></button>
+        </div>
+      </div>
+      <p class="footnote"><span id="modelName">qwen3.8-27b</span> · Built with ❤️ in Kuala Lumpur · <button id="settingsButton">Settings</button></p>
+    </footer>
+  </div>
+
+  <dialog id="settingsDialog">
+    <form method="dialog">
+      <div class="dialog-head"><h2>Generation settings</h2><button value="cancel">×</button></div>
+      <label>Maximum output tokens <output id="maxTokensValue">1024</output><input id="maxTokens" type="range" min="64" max="4096" step="64" value="1024"></label>
+      <label>Temperature <output id="temperatureValue">0.3</output><input id="temperature" type="range" min="0" max="2" step="0.1" value="0.3"></label>
+      <label class="toggle"><span><strong>Reasoning</strong><small>Show the model's thinking stream</small></span><input id="thinking" type="checkbox"></label>
+      <button class="done" value="default">Done</button>
+    </form>
+  </dialog>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

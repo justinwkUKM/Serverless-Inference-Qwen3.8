@@ -1,0 +1,15 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+tfplan
+__pycache__/
+*.pyc
+.env
+.env.*
+!env.example
+!.env.example
+scripts/env.sh
+node_modules/
+.DS_Store
+crash.log
+.commandcode/
