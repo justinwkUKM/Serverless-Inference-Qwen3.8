@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "measured_at": "2026-08-23T18:23:41.655125+00:00",
+    "endpoint_mode": "direct",
+    "prompt_mode": "shared-prefix",
+    "target_words": 1000,
+    "concurrency": 1,
+    "runs": 3,
+    "max_tokens": 128,
+    "timeout_seconds": 120,
+    "deployment_revision": "unrecorded",
+    "client_python": "3.14.7",
+    "client_platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O"
+  },
+  "summary": {
+    "successful_requests": 3,
+    "failed_requests": 0,
+    "ttft_mean_seconds": 2.629,
+    "ttft_p50_seconds": 2.895,
+    "ttft_p95_seconds": 2.998,
+    "ttft_p99_seconds": null,
+    "ttft_min_seconds": 1.983,
+    "ttft_max_seconds": 3.009,
+    "latency_mean_seconds": 2.836,
+    "decode_tps_mean": 579.93,
+    "aggregate_completion_tps_wall": 35.49,
+    "wall_seconds": 8.509
+  },
+  "results": [
+    {
+      "run": 1,
+      "status": "completed",
+      "prompt_mode": "shared-prefix",
+      "target_words": 1000,
+      "prompt_tokens": 1079,
+      "completion_tokens": 117,
+      "headers_seconds": 3.009,
+      "first_sse_seconds": 3.009,
+      "ttft_seconds": 3.009,
+      "decode_seconds": 0.265,
+      "total_seconds": 3.274,
+      "decode_tokens_per_second": 441.88,
+      "stream_chunks": 116
+    },
+    {
+      "run": 2,
+      "status": "completed",
+      "prompt_mode": "shared-prefix",
+      "target_words": 1000,
+      "prompt_tokens": 1078,
+      "completion_tokens": 70,
+      "headers_seconds": 1.983,
+      "first_sse_seconds": 1.983,
+      "ttft_seconds": 1.983,
+      "decode_seconds": 0.079,
+      "total_seconds": 2.063,
+      "decode_tokens_per_second": 881.19,
+      "stream_chunks": 69
+    },
+    {
+      "run": 3,
+      "status": "completed",
+      "prompt_mode": "shared-prefix",
+      "target_words": 1000,
+      "prompt_tokens": 1076,
+      "completion_tokens": 115,
+      "headers_seconds": 2.892,
+      "first_sse_seconds": 2.895,
+      "ttft_seconds": 2.895,
+      "decode_seconds": 0.276,
+      "total_seconds": 3.171,
+      "decode_tokens_per_second": 416.71,
+      "stream_chunks": 114
+    }
+  ],
+  "errors": []
+}

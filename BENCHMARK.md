@@ -91,6 +91,35 @@ All four requests began returning tokens at nearly the same time, demonstrating 
 
 ## Reproduce
 
+### TTFT optimization matrix
+
+The controlled TTFT runner records HTTP-header, first-SSE-byte, first-token,
+decode, total-latency, token-usage, and failure measurements. It writes raw
+JSON and a Markdown summary under `benchmarks/runs/`; endpoint URLs and keys
+are intentionally excluded from those artifacts.
+
+Print the low-cost smoke matrix without sending traffic:
+
+```bash
+bash scripts/benchmark-ttft.sh --phase smoke --mode direct
+```
+
+After confirming the endpoint is ready, execute it by adding `--execute`.
+Use `--mode proxy` with `QUICKSILVER_URL` to compare application overhead.
+The full `baseline` and `final` phases are intentionally explicit because
+they send many requests:
+
+```bash
+set -a && source .env && source scripts/env.sh && set +a
+bash scripts/benchmark-ttft.sh --phase baseline --mode direct --execute
+bash scripts/benchmark-ttft.sh --phase final --mode direct --execute
+```
+
+Each request has a 120-second default timeout. Pass
+`--timeout-seconds 900` only for an intentional cold-start probe. The runner
+supports `unique`, `shared-prefix`, and `cache-miss` prompt modes so prefix
+caching is measured rather than assumed.
+
 ```bash
 cd /Users/waqaskhalid/Documents/Local/VerdaServerless
 source scripts/env.sh
@@ -120,6 +149,19 @@ For a true cold measurement, wait until the Console reports zero replicas before
 - Decode throughput calculated from API token counts includes streaming and gateway behavior; it is not a kernel-only benchmark.
 - No long-context prompt was transmitted, so long-context quality and prefill performance remain unmeasured.
 
+## TTFT optimization implementation status
+
+The controlled runner and Terraform experiment controls are implemented on
+the `feature/ttft-optimization` branch. On 24 August 2026, the first smoke
+probe coincided with a Verda image pull and model initialization. The
+authenticated `/health` request returned no bytes during the initial probe and
+the final bounded 60-second readiness check, so no generation request was
+counted as a warm-TTFT sample. The probe was stopped before the 15-minute
+upstream deadline.
+
+Once the Console reports the replica ready, run the smoke phase first. Only
+after it succeeds should the baseline or candidate matrices be executed.
+
 ## Post-optimization verification
 
 On 20 August 2026, after reducing the context limit to 65,536 tokens, enabling
@@ -143,3 +185,39 @@ mean decode throughput of **332.28 tokens/second**. Compared with the original
 Because the prompt is very short, repeated prefix-cache hits did not materially
 change TTFT; the remaining roughly 3.3-second floor is likely dominated by
 gateway, queue, and request-serving overhead rather than prompt prefill.
+
+## Current warm endpoint probe — 24 August 2026
+
+The controlled runner was executed against the currently ready endpoint with
+128 requested output tokens and thinking disabled. Raw JSON and Markdown
+reports are saved under `benchmarks/runs/`:
+
+| Profile | Requests | TTFT mean | TTFT p50 | TTFT p95 | Decode speed | Failures |
+|---|---:|---:|---:|---:|---:|---:|
+| 50-word unique, sequential | 3 | 14.940 s | 2.397 s | 36.359 s | 384.56 tok/s | 0 |
+| 1,000-word shared-prefix, sequential | 3 | 2.629 s | 2.895 s | 2.998 s | 579.93 tok/s | 0 |
+| 50-word shared-prefix, four parallel workers | 4 | 2.666 s | 2.637 s | 2.847 s | 386.05 tok/s | 0 |
+| Follow-up 50-word unique, sequential | 1 | 2.328 s | 2.328 s | 2.328 s | 392.35 tok/s | 0 |
+
+The 40.133-second first request in the sequential cell is a startup/scale
+transition outlier; the following requests and the exact four-request
+parallel sample stayed in the 2–3 second TTFT range. A separate three-request
+parallel probe after an idle transition measured 49.383–51.359 seconds TTFT,
+which confirms that the endpoint can leave the warm path even when a health
+surface reports it as available.
+
+### Optimization decision
+
+Do not change the vLLM batching flags based on this short-prompt sample:
+decode speed and warm TTFT are already healthy, and prefix caching cannot
+materially reduce a roughly 2.5-second gateway/scheduling floor for 125-token
+inputs. The next production decision is replica policy:
+
+1. Keep `min_replica_count = 0` for cost-sensitive experiments and accept
+   occasional cold/startup latency.
+2. Use `min_replica_count = 1` (or a longer scale-down delay) for a strict
+   1–3 second interactive TTFT target; this trades idle GPU cost for
+   predictable readiness.
+3. Repeat the matrix with representative 1K/10K-token prompts and p50/p95/p99
+   before changing `max_num_batched_tokens` or enabling more aggressive
+   prefill tuning.

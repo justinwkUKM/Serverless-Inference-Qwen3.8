@@ -1,0 +1,7 @@
+# Copy to a local, ignored .tfvars file when running a controlled TTFT test.
+# Change one variable at a time and record the value in the benchmark revision.
+
+min_replicas              = 0
+max_num_batched_tokens    = 16384
+enable_chunked_prefill    = true
+mixed_prefill_tuning      = false

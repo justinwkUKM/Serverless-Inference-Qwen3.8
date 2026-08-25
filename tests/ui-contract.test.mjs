@@ -14,6 +14,7 @@ test("inference demo exposes endpoint controls, accessible feedback, and safe co
   assert.match(html, /id="statusAnnouncements" aria-live="polite"/);
   assert.match(html, /id="maxTokens"[^>]+value="4096"/);
   assert.match(html, /id="contextBudget"/);
+  assert.match(html, /id="notificationSound"/);
 });
 
 test("concurrency demo exposes shared actions, mobile navigation, and comparable metrics", async () => {
@@ -30,4 +31,16 @@ test("concurrency demo exposes shared actions, mobile navigation, and comparable
   assert.match(app, /selectConcurrencyWinners/);
   assert.match(css, /\.worker-metrics \.best-metric/);
   assert.match(css, /\.worker-mobile-nav/);
+});
+
+test("completion notifications are opt-in to hidden-tab behavior and user configurable", async () => {
+  const [html, app] = await Promise.all([
+    readFile(new URL("public/index.html", root), "utf8"),
+    readFile(new URL("public/app.js", root), "utf8"),
+  ]);
+  assert.match(html, /id="notificationSound"[^>]+checked/);
+  assert.match(app, /document\.hidden/);
+  assert.match(app, /function playCompletionSound/);
+  assert.match(app, /localStorage\.setItem\("notificationSound"/);
+  assert.match(app, /status==="ready"&&wasActive/);
 });

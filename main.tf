@@ -7,7 +7,7 @@ resource "verda_container" "qwen38" {
   }
 
   scaling = {
-    min_replica_count               = 0
+    min_replica_count               = var.min_replicas
     max_replica_count               = var.max_replicas
     queue_message_ttl_seconds       = 900
     deadline_seconds                = 900
@@ -34,7 +34,7 @@ resource "verda_container" "qwen38" {
 
       entrypoint_overrides = {
         enabled = true
-        cmd = [
+        cmd = concat([
           "--model",
           var.model_id,
           "--served-model-name",
@@ -49,7 +49,7 @@ resource "verda_container" "qwen38" {
           "0.90",
           "--enable-prefix-caching",
           "--max-num-batched-tokens",
-          "16384",
+          tostring(var.max_num_batched_tokens),
           "--reasoning-parser",
           "qwen3",
           "--default-chat-template-kwargs",
@@ -57,7 +57,14 @@ resource "verda_container" "qwen38" {
           "--enable-auto-tool-choice",
           "--tool-call-parser",
           "qwen3_coder"
-        ]
+          ], var.enable_chunked_prefill ? ["--enable-chunked-prefill"] : [], var.mixed_prefill_tuning ? [
+          "--max-num-partial-prefills",
+          "2",
+          "--max-long-partial-prefills",
+          "1",
+          "--long-prefill-token-threshold",
+          "4096"
+        ] : [])
       }
 
       env = [

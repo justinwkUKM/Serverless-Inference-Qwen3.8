@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "measured_at": "2026-08-23T18:23:32.924126+00:00",
+    "endpoint_mode": "direct",
+    "prompt_mode": "unique",
+    "target_words": 50,
+    "concurrency": 1,
+    "runs": 3,
+    "max_tokens": 128,
+    "timeout_seconds": 120,
+    "deployment_revision": "unrecorded",
+    "client_python": "3.14.7",
+    "client_platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O"
+  },
+  "summary": {
+    "successful_requests": 3,
+    "failed_requests": 0,
+    "ttft_mean_seconds": 14.94,
+    "ttft_p50_seconds": 2.397,
+    "ttft_p95_seconds": 36.359,
+    "ttft_p99_seconds": null,
+    "ttft_min_seconds": 2.29,
+    "ttft_max_seconds": 40.133,
+    "latency_mean_seconds": 15.193,
+    "decode_tps_mean": 384.56,
+    "aggregate_completion_tps_wall": 6.41,
+    "wall_seconds": 45.582
+  },
+  "results": [
+    {
+      "run": 1,
+      "status": "completed",
+      "prompt_mode": "unique",
+      "target_words": 50,
+      "prompt_tokens": 128,
+      "completion_tokens": 106,
+      "headers_seconds": 40.133,
+      "first_sse_seconds": 40.133,
+      "ttft_seconds": 40.133,
+      "decode_seconds": 0.252,
+      "total_seconds": 40.385,
+      "decode_tokens_per_second": 420.52,
+      "stream_chunks": 105
+    },
+    {
+      "run": 2,
+      "status": "completed",
+      "prompt_mode": "unique",
+      "target_words": 50,
+      "prompt_tokens": 127,
+      "completion_tokens": 92,
+      "headers_seconds": 2.288,
+      "first_sse_seconds": 2.29,
+      "ttft_seconds": 2.29,
+      "decode_seconds": 0.245,
+      "total_seconds": 2.535,
+      "decode_tokens_per_second": 375.26,
+      "stream_chunks": 91
+    },
+    {
+      "run": 3,
+      "status": "completed",
+      "prompt_mode": "unique",
+      "target_words": 50,
+      "prompt_tokens": 130,
+      "completion_tokens": 94,
+      "headers_seconds": 2.395,
+      "first_sse_seconds": 2.397,
+      "ttft_seconds": 2.397,
+      "decode_seconds": 0.263,
+      "total_seconds": 2.66,
+      "decode_tokens_per_second": 357.89,
+      "stream_chunks": 93
+    }
+  ],
+  "errors": []
+}
