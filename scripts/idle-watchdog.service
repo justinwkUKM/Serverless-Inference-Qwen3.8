@@ -1,0 +1,16 @@
+[Unit]
+Description=vLLM 10-Minute Idle Shutdown Watchdog
+After=docker.service network.target
+
+[Service]
+Type=simple
+Environment="HOME=/root"
+Environment="VERDA_INSTANCE_ID=9a80c4e7-d072-4a13-8551-109878f45cc9"
+ExecStart=/usr/bin/python3 -u /usr/local/bin/idle_watchdog.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

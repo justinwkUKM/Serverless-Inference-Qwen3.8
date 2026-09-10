@@ -16,6 +16,8 @@ source "${ENV_FILE}"
 # Pass the friendly environment names through to Terraform variables.
 export TF_VAR_deployment_name="${DEPLOYMENT_NAME}"
 export TF_VAR_model_id="${MODEL_ID}"
+export TF_VAR_gpu_type="${GPU_TYPE:-A100}"
+export TF_VAR_scale_down_delay_seconds="${SCALE_DOWN_DELAY_SECONDS:-1800}"
 
 echo "== Verda Qwen3.8 deployment =="
 echo "Deployment: ${DEPLOYMENT_NAME}"

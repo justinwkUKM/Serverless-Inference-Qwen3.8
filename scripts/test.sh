@@ -7,21 +7,22 @@ cd "${PROJECT_DIR}"
 
 ENDPOINT="${VERDA_ENDPOINT:-$(terraform output -raw endpoint_base_url)}"
 : "${VERDA_INFERENCE_KEY:?Set VERDA_INFERENCE_KEY or source scripts/env.sh}"
+MODEL="${VERDA_MODEL:-Antanom}"
 
 curl --fail --silent --show-error \
   -X POST \
   "${ENDPOINT%/}/v1/chat/completions" \
   -H "Authorization: Bearer ${VERDA_INFERENCE_KEY}" \
   -H "Content-Type: application/json" \
-  -d '{
-    "model": "qwen3.8-27b",
-    "messages": [
-      {"role": "system", "content": "You are a concise cybersecurity analyst."},
-      {"role": "user", "content": "Explain Kerberoasting and provide three defensive controls."}
+  -d "{
+    \"model\": \"${MODEL}\",
+    \"messages\": [
+      {\"role\": \"system\", \"content\": \"You are a concise cybersecurity analyst.\"},
+      {\"role\": \"user\", \"content\": \"Explain Kerberoasting and provide three defensive controls.\"}
     ],
-    "temperature": 0.7,
-    "top_p": 0.8,
-    "max_tokens": 512,
-    "stream": false
-  }'
+    \"temperature\": 0.7,
+    \"top_p\": 0.8,
+    \"max_tokens\": 512,
+    \"stream\": false
+  }"
 echo

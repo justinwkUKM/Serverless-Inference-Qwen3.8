@@ -39,6 +39,17 @@ variable "min_replicas" {
   }
 }
 
+variable "scale_down_delay_seconds" {
+  type        = number
+  description = "Idle delay before a serverless replica is scaled down"
+  default     = 1800
+
+  validation {
+    condition     = var.scale_down_delay_seconds >= 0
+    error_message = "scale_down_delay_seconds must be non-negative."
+  }
+}
+
 variable "max_num_batched_tokens" {
   type        = number
   description = "vLLM scheduler token budget per iteration"

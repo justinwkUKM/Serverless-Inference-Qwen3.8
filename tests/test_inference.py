@@ -8,8 +8,10 @@ api_key = os.environ["VERDA_INFERENCE_KEY"]
 
 client = OpenAI(base_url=f"{base_url}/v1", api_key=api_key, timeout=900.0)
 
+model = os.getenv("VERDA_MODEL", "Antanom")
+
 response = client.chat.completions.create(
-    model="qwen3.8-27b",
+    model=model,
     messages=[
         {"role": "system", "content": "You are a cybersecurity analyst."},
         {

@@ -8,7 +8,6 @@ import { ChatDatabase } from "./database.mjs";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 const publicDir = join(root, "public");
-const model = process.env.VERDA_MODEL || "qwen3.8-27b";
 const port = Number(process.env.PORT || 4173);
 const host = process.env.HOST || "127.0.0.1";
 const databasePath = process.env.QUICKSILVER_DB_PATH || join(root, "data", "quicksilver.sqlite");
@@ -35,6 +34,7 @@ async function envFileValue(name) {
   return undefined;
 }
 
+const model = process.env.VERDA_MODEL || await envFileValue("VERDA_MODEL") || "Antanom";
 const inferenceKey = process.env.VERDA_INFERENCE_KEY || await envFileValue("VERDA_INFERENCE_KEY");
 const tavilyKey = process.env.TAVILY_API_KEY || await envFileValue("TAVILY_API_KEY");
 const tavilyConfigured = Boolean(tavilyKey && !tavilyKey.startsWith("PASTE_"));

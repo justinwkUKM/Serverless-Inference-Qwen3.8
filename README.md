@@ -71,9 +71,9 @@ Open [http://127.0.0.1:4173](http://127.0.0.1:4173).
 
 ## Deploy to Verda
 
-The current profile uses Qwen3.8 27B NVFP4 on one RTX PRO 6000 On-Demand GPU,
-a 32,768-token context, FP8 KV cache, prefix caching, and a 300-second
-scale-down delay.
+The current profile uses Qwen3.8 27B NVFP4 on one RTX PRO 6000 GPU,
+a 32,768-token context, FP8 KV cache, prefix caching, and a 30-minute
+scale-down delay before an idle deployment reaches zero replicas.
 
 ```bash
 source scripts/env.sh
@@ -89,6 +89,28 @@ export VERDA_ENDPOINT="$(terraform output -raw endpoint_base_url)"
 ```
 
 Remove the deployment and persistent cache with `./scripts/destroy.sh`.
+
+## Dedicated A100 VM & Automated Watchdog
+
+For high-throughput workloads and custom fine-tuned weights (e.g. `MaanVad3r/Antanom`), an on-demand dedicated **1x NVIDIA A100 SXM4 80GB** VM profile is supported (`1A100.22V`).
+
+- **Model Serving:** `MaanVad3r/Antanom` served via vLLM with FP8 KV cache and 128K context window.
+- **Automated Cost Control:** Built-in `idle-watchdog.service` monitors vLLM Prometheus metrics and active SSH sessions.
+- **Auto-Shutdown:** Automatically calls the Verda Cloud API and powers off the machine after **10 minutes** of complete inactivity, halting the \$1.79/hr GPU compute charge and preserving NVMe storage.
+
+```bash
+# Start instance
+verda vm start 9a80c4e7-d072-4a13-8551-109878f45cc9
+
+# Check status
+verda vm list
+
+# Re-create if terminated from scratch
+verda vm create --kind gpu --instance-type 1A100.22V --location FIN-01 --os ubuntu-24.04-cuda-12.8-open-docker --os-volume-size 200 --hostname antanom-a100-vm --ssh-key <YOUR_SSH_KEY_ID>
+# Run: bash scripts/provision_vm.sh on the new VM
+```
+
+See the [Dedicated VM & Watchdog Operations Guide](docs/VM_WATCHDOG_OPERATIONS.md) and [Recreation & Setup Guide](docs/REPRODUCIBILITY_AND_SETUP.md) for complete details.
 
 ## Files and conversation context
 
@@ -157,7 +179,11 @@ the [security analysis](docs/SECURITY_ANALYSIS.md) for details.
 
 ## Documentation
 
-- [Benchmark results](benchmarks/2026-08-21-warm-endpoint.md)
+- [Verda VM & Automated Watchdog Operations Guide](docs/VM_WATCHDOG_OPERATIONS.md)
+- [VM Specification & Rapid Recreation Guide](docs/REPRODUCIBILITY_AND_SETUP.md)
+- [vLLM & Antanom Model Inference Guide](docs/VLLM_AND_MODEL_INFERENCE_GUIDE.md)
+- [Offensive Cybersecurity 10-Prompt Benchmark Report](benchmarks/runs/offensive_10_benchmark_report.md)
+- [Serverless Benchmark results](benchmarks/2026-08-21-warm-endpoint.md)
 - [Security analysis](docs/SECURITY_ANALYSIS.md)
 - [Google ADK implementation plan](docs/Implementation%20plan%20for%20ADK.md)
 

@@ -18,7 +18,7 @@ resource "verda_container" "qwen38" {
     }
 
     scale_down_policy = {
-      delay_seconds = 300
+      delay_seconds = var.scale_down_delay_seconds
     }
 
     queue_load = {

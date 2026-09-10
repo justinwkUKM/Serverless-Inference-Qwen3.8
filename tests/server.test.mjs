@@ -104,6 +104,7 @@ before(async () => {
       PORT: String(appPort),
       VERDA_ENDPOINT: `http://127.0.0.1:${upstreamPort}`,
       VERDA_INFERENCE_KEY: "test-inference-key",
+      VERDA_MODEL: "Antanom",
       TAVILY_API_KEY: "test-tavily-key",
       TAVILY_ENDPOINT: `http://127.0.0.1:${upstreamPort}/search`,
       QUICKSILVER_DB_PATH: ":memory:",
@@ -126,7 +127,7 @@ test("public configuration reports capabilities without leaking secrets", async 
   assert.equal(response.headers.get("x-frame-options"), "DENY");
   const config = await response.json();
   assert.deepEqual(config, {
-    model: "qwen3.8-27b",
+    model: "Antanom",
     scaleDownSeconds: 300,
     configured: true,
     webSearchConfigured: true,
