@@ -37,7 +37,7 @@ scp -i ~/.ssh/google_compute_engine scripts/provision_vm.sh root@$NEW_IP:/root/p
 ssh -i ~/.ssh/google_compute_engine root@$NEW_IP "bash /root/provision_vm.sh"
 ```
 
-The script automatically installs Verda CLI, configures API credentials, installs and starts the 10-minute idle watchdog daemon, pulls the vLLM container, and begins loading `MaanVad3r/Antanom`.
+The script automatically installs Verda CLI, configures API credentials, installs and starts the 15-minute idle watchdog daemon, pulls the vLLM container, and begins loading `MaanVad3r/Antanom`.
 
 ---
 
@@ -100,7 +100,7 @@ docker run -d \
 ### Systemd Unit File: `/etc/systemd/system/idle-watchdog.service`
 ```ini
 [Unit]
-Description=vLLM 10-Minute Idle Shutdown Watchdog
+Description=vLLM 15-Minute Idle Shutdown Watchdog
 After=docker.service network.target
 
 [Service]
@@ -117,7 +117,7 @@ WantedBy=multi-user.target
 ```
 
 ### Key Watchdog Script Settings (`/usr/local/bin/idle_watchdog.py`)
-- `IDLE_LIMIT = 600` (10 minutes)
+- `IDLE_LIMIT = 900` (15 minutes)
 - `POLL_INTERVAL = 5` (Checks metrics every 5 seconds)
 - `METRICS_URL = "http://127.0.0.1:8000/metrics"`
 - **Verda API Auth:** Reads credentials from `/root/.verda/credentials`.
@@ -145,7 +145,7 @@ After deploying a new VM, execute these verification checks:
    ```bash
    journalctl -u idle-watchdog -n 10 --no-pager
    ```
-   *Expected:* `Idle watchdog started. Idle limit: 600s (10 min).`
+   *Expected:* `Idle watchdog started. Idle limit: 900s (15 min).`
 
 4. **Verify Verda Cloud CLI from Inside VM:**
    ```bash

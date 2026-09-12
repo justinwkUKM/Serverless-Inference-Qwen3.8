@@ -182,6 +182,7 @@ the [security analysis](docs/SECURITY_ANALYSIS.md) for details.
 - [Verda VM & Automated Watchdog Operations Guide](docs/VM_WATCHDOG_OPERATIONS.md)
 - [VM Specification & Rapid Recreation Guide](docs/REPRODUCIBILITY_AND_SETUP.md)
 - [vLLM & Antanom Model Inference Guide](docs/VLLM_AND_MODEL_INFERENCE_GUIDE.md)
+- [CyberGym 10-Task Benchmark Operations Guide](docs/CYBERGYM_10_BENCHMARK_GUIDE.md)
 - [Offensive Cybersecurity 10-Prompt Benchmark Report](benchmarks/runs/offensive_10_benchmark_report.md)
 - [Serverless Benchmark results](benchmarks/2026-08-21-warm-endpoint.md)
 - [Security analysis](docs/SECURITY_ANALYSIS.md)

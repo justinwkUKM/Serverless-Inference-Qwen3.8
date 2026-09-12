@@ -7,7 +7,7 @@ import sys
 import os
 import json
 
-IDLE_LIMIT = 600   # 10 minutes in seconds
+IDLE_LIMIT = 900   # 15 minutes in seconds
 POLL_INTERVAL = 5  # Check every 5 seconds for fast detection
 METRICS_URL = "http://127.0.0.1:8000/metrics"
 
@@ -69,7 +69,7 @@ def cloud_shutdown(instance_id):
         log(f"Verda Cloud API call error: {e}")
 
 def main():
-    log(f"Idle watchdog started. Idle limit: {IDLE_LIMIT}s (10 min). Poll interval: {POLL_INTERVAL}s.")
+    log(f"Idle watchdog started. Idle limit: {IDLE_LIMIT}s (15 min). Poll interval: {POLL_INTERVAL}s.")
     last_activity = time.time()
     last_completed = None
     last_running_state = False
