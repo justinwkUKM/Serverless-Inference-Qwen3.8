@@ -66,47 +66,74 @@ def find_ssh_key() -> Optional[str]:
     return None
 
 
+def extract_local_steps() -> Dict[str, int]:
+    """Parses OpenCode log to determine current max step per task."""
+    p = Path("/root/.local/share/opencode/log/opencode.log")
+    if not p.exists():
+        return {}
+    try:
+        text = p.read_text(errors="ignore")
+        r2t = {}
+        r2s = {}
+        for l in text.splitlines():
+            m_run = re.search(r"run=([0-9a-f]+)", l)
+            if not m_run:
+                continue
+            rid = m_run.group(1)
+            m_dir = re.search(r"directory=.*?/(arvo_\d+)", l)
+            if m_dir:
+                r2t[rid] = m_dir.group(1).replace("_", ":")
+            m_step = re.search(r"step=(\d+)", l)
+            if m_step:
+                r2s[rid] = max(r2s.get(rid, 0), int(m_step.group(1)))
+        return {r2t[r]: r2s.get(r, 0) for r in r2t}
+    except Exception:
+        return {}
+
+
 def fetch_remote_state(host: str, ssh_key: Optional[str] = None) -> Tuple[Optional[Dict], str]:
     """Fetches benchmark state JSON and host telemetry from remote VM over SSH."""
-    key_opt = f"-i {ssh_key} " if ssh_key else ""
-    remote_cmd = (
-        "bash -c '"
-        "LATEST=$(ls -td /root/cybergym_benchmark/benchmarks/runs/iteration_* 2>/dev/null | head -1);"
-        "if [ -n \"$LATEST\" ] && [ -f \"$LATEST/benchmark_state.json\" ]; then "
-        "  cat \"$LATEST/benchmark_state.json\"; "
-        "elif [ -f /root/cybergym_benchmark/benchmarks/runs/cybergym_10/benchmark_state.json ]; then "
-        "  cat /root/cybergym_benchmark/benchmarks/runs/cybergym_10/benchmark_state.json; "
-        "else "
-        "  echo \"{}\"; "
-        "fi; "
-        "echo \"===GPU===\"; "
-        "nvidia-smi --query-gpu=memory.total,memory.used,utilization.gpu --format=csv,noheader,nounits 2>/dev/null || echo \"N/A\""
-        "'"
+    key_args = ["-i", ssh_key] if ssh_key else []
+    remote_script = (
+        "import re, json, subprocess\n"
+        "from pathlib import Path\n"
+        "runs = sorted(Path('/root/cybergym_benchmark/benchmarks/runs').glob('iteration_*'), key=lambda p: p.stat().st_mtime if p.exists() else 0, reverse=True)\n"
+        "state_f = (runs[0] / 'benchmark_state.json') if runs else Path('/root/cybergym_benchmark/benchmarks/runs/cybergym_10/benchmark_state.json')\n"
+        "data = json.loads(state_f.read_text()) if state_f.exists() else {}\n"
+        "try:\n"
+        "    res = subprocess.run(['nvidia-smi', '--query-gpu=memory.total,memory.used,utilization.gpu', '--format=csv,noheader,nounits'], capture_output=True, text=True)\n"
+        "    if res.returncode == 0:\n"
+        "        p = [x.strip() for x in res.stdout.strip().split(',')]\n"
+        "        data.setdefault('host_metrics', {})['gpu_vram_total_mb'] = p[0]\n"
+        "        data['host_metrics']['gpu_vram_used_mb'] = p[1]\n"
+        "        data['host_metrics']['gpu_util_pct'] = p[2]\n"
+        "except Exception:\n"
+        "    pass\n"
+        "log_p = Path('/root/.local/share/opencode/log/opencode.log')\n"
+        "if log_p.exists():\n"
+        "    r2t, r2s = {}, {}\n"
+        "    for l in log_p.read_text(errors='ignore').splitlines():\n"
+        "        m_run = re.search(r'run=([0-9a-f]+)', l)\n"
+        "        if not m_run: continue\n"
+        "        rid = m_run.group(1)\n"
+        "        m_dir = re.search(r'directory=.*?/(arvo_\\\\d+)', l)\n"
+        "        if m_dir: r2t[rid] = m_dir.group(1).replace('_', ':')\n"
+        "        m_step = re.search(r'step=(\\\\d+)', l)\n"
+        "        if m_step: r2s[rid] = max(r2s.get(rid, 0), int(m_step.group(1)))\n"
+        "    for r, tid in r2t.items():\n"
+        "        if tid in data.get('tasks', {}):\n"
+        "            data['tasks'][tid]['steps'] = r2s.get(r, 0)\n"
+        "print(json.dumps(data))\n"
     )
-    cmd = f"ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 {key_opt}{host} \"{remote_cmd}\""
+    cmd = ["ssh", "-o", "StrictHostKeyChecking=no", "-o", "ConnectTimeout=5"] + key_args + [host, f"python3 -c \"{remote_script}\""]
     try:
-        res = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=10)
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=12)
         if res.returncode != 0:
             return None, f"SSH error ({res.returncode}): {res.stderr.strip()}"
-        
-        parts = res.stdout.split("===GPU===")
-        state_json = parts[0].strip()
-        gpu_info = parts[1].strip() if len(parts) > 1 else ""
-
-        if not state_json or state_json == "{}":
-            return None, "No active benchmark_state.json found on remote VM."
-
-        data = json.loads(state_json)
-        if gpu_info and gpu_info != "N/A":
-            try:
-                gparts = [x.strip() for x in gpu_info.split(",")]
-                if len(gparts) >= 2:
-                    data.setdefault("host_metrics", {})
-                    data["host_metrics"]["gpu_vram_total_mb"] = gparts[0]
-                    data["host_metrics"]["gpu_vram_used_mb"] = gparts[1]
-                    data["host_metrics"]["gpu_util_pct"] = gparts[2] if len(gparts) > 2 else "0"
-            except Exception:
-                pass
+        out = res.stdout.strip()
+        if not out or out == "{}":
+            return None, "No active benchmark state found on remote VM."
+        data = json.loads(out)
         return data, ""
     except subprocess.TimeoutExpired:
         return None, "SSH connection timed out."
@@ -190,7 +217,7 @@ def render_dashboard(data: Dict, source_label: str, show_all: bool = False):
     out.append(f"  Telemetry: Disk Free: {CLR_BOLD}{disk_free} GB{CLR_RESET}  |  "
                f"RAM Available: {CLR_BOLD}{ram_avail} GB{CLR_RESET}{gpu_str}")
     out.append(f"{CLR_GRAY}{'-' * banner_width}{CLR_RESET}")
-    out.append(f"  {'TASK ID':<16} {'STATUS':<11} {'PHASE':<17} {'RUNTIME':<10} {'DELIVERABLES':<14} {'INFO'}")
+    out.append(f"  {'TASK ID':<16} {'STATUS':<11} {'PHASE':<17} {'STEPS':<8} {'RUNTIME':<10} {'DELIVERABLES':<14} {'INFO'}")
     out.append(f"{CLR_GRAY}{'-' * banner_width}{CLR_RESET}")
 
     tasks = data.get("tasks", {})
@@ -241,6 +268,9 @@ def render_dashboard(data: Dict, source_label: str, show_all: bool = False):
             except Exception:
                 pass
 
+        steps_val = tinfo.get("steps", "-")
+        steps_display = f"{steps_val}" if steps_val != "-" else "-"
+
         poc = f"{CLR_GREEN}PoC:✓{CLR_RESET}" if tinfo.get("has_poc") else f"{CLR_GRAY}PoC:✗{CLR_RESET}"
         patch = f"{CLR_GREEN}Patch:✓{CLR_RESET}" if tinfo.get("has_patch") else f"{CLR_GRAY}Patch:✗{CLR_RESET}"
         artifacts = f"{poc} {patch}"
@@ -272,7 +302,7 @@ def render_dashboard(data: Dict, source_label: str, show_all: bool = False):
         else:
             st_color = CLR_GRAY
 
-        out.append(f"  {tid:<16} {st_color}{st:<11}{CLR_RESET} {ph:<17} {elapsed_display:<10} {artifacts:<25} {details_str}")
+        out.append(f"  {tid:<16} {st_color}{st:<11}{CLR_RESET} {ph:<17} {steps_display:<8} {elapsed_display:<10} {artifacts:<25} {details_str}")
 
     if not show_all and len(sorted_tasks) > len(displayed_tasks):
         hidden_count = len(sorted_tasks) - len(displayed_tasks)
@@ -320,6 +350,10 @@ def main():
                 else:
                     try:
                         data = json.loads(state_path.read_text())
+                        local_steps = extract_local_steps()
+                        for tid, tinfo in data.get("tasks", {}).items():
+                            if tid in local_steps:
+                                tinfo["steps"] = local_steps[tid]
                         render_dashboard(data, str(state_path), show_all=args.all)
                     except Exception as e:
                         print(f"{CLR_RED}[!] Error reading {state_path}: {e}{CLR_RESET}")
