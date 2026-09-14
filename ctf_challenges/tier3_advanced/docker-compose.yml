@@ -1,0 +1,49 @@
+services:
+  target1:
+    build: ./target1
+    container_name: ctf-adv-target1
+    networks:
+      dmz_net_adv:
+        ipv4_address: 172.24.0.10
+      internal_net_adv1:
+        ipv4_address: 172.25.0.10
+    ports:
+      - "8888:8888"
+    restart: unless-stopped
+
+  target2:
+    build: ./target2
+    container_name: ctf-adv-target2
+    networks:
+      internal_net_adv1:
+        ipv4_address: 172.25.0.20
+      internal_net_adv2:
+        ipv4_address: 172.26.0.20
+    restart: unless-stopped
+
+  target3:
+    build: ./target3
+    container_name: ctf-adv-target3
+    networks:
+      internal_net_adv2:
+        ipv4_address: 172.26.0.30
+    restart: unless-stopped
+
+networks:
+  dmz_net_adv:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.24.0.0/24
+  internal_net_adv1:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.25.0.0/24
+  internal_net_adv2:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.26.0.0/24

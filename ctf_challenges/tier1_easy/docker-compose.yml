@@ -1,0 +1,33 @@
+services:
+  target1:
+    build: ./target1
+    container_name: ctf-target1
+    networks:
+      dmz_net:
+        ipv4_address: 172.20.0.10
+      internal_net:
+        ipv4_address: 172.21.0.10
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  target2:
+    build: ./target2
+    container_name: ctf-target2
+    networks:
+      internal_net:
+        ipv4_address: 172.21.0.20
+    restart: unless-stopped
+
+networks:
+  dmz_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+  internal_net:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
