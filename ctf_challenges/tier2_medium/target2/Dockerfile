@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y     python3 python3-pip python3-flask s
 
 RUN useradd -m -s /bin/bash svc_runner
 
-RUN mkdir -p /opt &&     echo 'import custom_logger\nprint("System metrics recorded")' > /opt/monitor.py &&     echo 'def log(): pass' > /opt/custom_logger.py
+RUN mkdir -p /opt &&     echo 'import custom_logger\nprint("System metrics recorded")' > /opt/monitor.py &&     echo 'def log(): pass' > /opt/custom_logger.py &&     chmod 777 /opt
 
 # Sudo rule: svc_runner can run python /opt/monitor.py without password
 RUN echo 'svc_runner ALL=(ALL) NOPASSWD: /usr/bin/python3 /opt/monitor.py *' >> /etc/sudoers

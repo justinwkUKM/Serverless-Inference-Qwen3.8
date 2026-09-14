@@ -14,7 +14,7 @@ RUN echo "export PATH=/home/operator/bin" > /home/operator/.bashrc && chown root
 
 COPY key_t1_t2.pub /home/operator/.ssh/authorized_keys
 COPY key_t2_t3 /home/operator/.ssh/id_rsa_vault
-RUN chown -R operator:operator /home/operator/.ssh && chmod 700 /home/operator/.ssh && chmod 600 /home/operator/.ssh/*
+RUN chown -R operator:operator /home/operator/.ssh && chmod 700 /home/operator/.ssh && chmod 600 /home/operator/.ssh/authorized_keys /home/operator/.ssh/id_rsa_vault
 
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
