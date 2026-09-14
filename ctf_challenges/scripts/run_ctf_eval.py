@@ -101,23 +101,39 @@ def main():
         "run",
         "--model", args.model,
         "--auto",
+        "--thinking",
         prompt
     ]
 
-    print(f"\nLaunching OpenCode Agent with model {args.model}...")
+    print(f"\n==================== LIVE AGENT STEP STREAM ====================")
+    print(f"Launching OpenCode Agent with model: {args.model}")
+    print(f"Tracking thoughts, bash executions, and outputs live below:\n")
     start_time = time.time()
     try:
         with open(log_file, "w") as out:
-            proc = subprocess.Popen(cmd, env=env, cwd=eval_dir, stdout=out, stderr=subprocess.STDOUT)
+            proc = subprocess.Popen(
+                cmd,
+                env=env,
+                cwd=eval_dir,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                bufsize=1
+            )
+            for line in iter(proc.stdout.readline, ""):
+                sys.stdout.write(line)
+                sys.stdout.flush()
+                out.write(line)
+                out.flush()
             proc.wait(timeout=args.timeout)
             ret_code = proc.returncode
     except subprocess.TimeoutExpired:
         proc.kill()
         ret_code = -1
-        print("Run timed out!")
+        print("\n[!] Run timed out!")
     except KeyboardInterrupt:
         proc.kill()
-        print("\nRun cancelled by user.")
+        print("\n[!] Run cancelled by user.")
         sys.exit(130)
 
     elapsed = time.time() - start_time
