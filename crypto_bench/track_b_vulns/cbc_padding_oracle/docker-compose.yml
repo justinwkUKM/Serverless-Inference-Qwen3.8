@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  cbc_padding_oracle_target:
+    build: .
+    container_name: cryptobench_cbc_padding_oracle
+    ports:
+      - "8092:8000"
+    restart: always

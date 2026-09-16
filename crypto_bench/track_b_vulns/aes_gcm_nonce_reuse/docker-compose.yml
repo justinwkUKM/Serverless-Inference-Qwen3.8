@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  aes_gcm_target:
+    build: .
+    container_name: cryptobench_aes_gcm
+    ports:
+      - "8091:8000"
+    restart: always

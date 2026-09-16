@@ -1,0 +1,205 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:f1a2b3c4-d5e6-47a8-9b0c-1d2e3f4a5b6c",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-09-17T00:00:00Z",
+    "component": {
+      "type": "application",
+      "name": "FinTech Core Monorepo",
+      "version": "2.4.0"
+    }
+  },
+  "components": [
+    {
+      "type": "cryptographic-asset",
+      "name": "AES-ECB",
+      "bom-ref": "crypto-aes-ecb",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "block-cipher",
+          "parameterSetIdentifier": "128",
+          "mode": "ecb",
+          "classicalSecurityLevel": 128,
+          "cryptoFunctions": ["encrypt", "decrypt"]
+        },
+        "detectionContext": {
+          "filePath": "auth_service/main.py",
+          "line": 34
+        },
+        "vulnerabilities": ["ECB mode pattern leakage"]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "MD5",
+      "bom-ref": "crypto-md5",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "hash",
+          "classicalSecurityLevel": 0,
+          "cryptoFunctions": ["digest"]
+        },
+        "detectionContext": {
+          "filePath": "auth_service/main.py",
+          "line": 19
+        },
+        "vulnerabilities": ["Collision attacks", "Insecure for password hashing"]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "SHA-1",
+      "bom-ref": "crypto-sha1",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "hash",
+          "classicalSecurityLevel": 80,
+          "cryptoFunctions": ["digest"]
+        },
+        "detectionContext": {
+          "filePath": "auth_service/main.py",
+          "line": 28
+        },
+        "vulnerabilities": ["Collision attacks (SHAttered)"]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "Insecure-PRNG-Python-Random",
+      "bom-ref": "crypto-prng-random",
+      "cryptoProperties": {
+        "assetType": "related-crypto-material",
+        "algorithmProperties": {
+          "primitive": "pqc-none",
+          "cryptoFunctions": ["keygen", "token-generation"]
+        },
+        "detectionContext": {
+          "filePath": "auth_service/main.py",
+          "line": 26
+        },
+        "vulnerabilities": ["Mersenne Twister state recovery, predictable session token"]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "AES-GCM",
+      "bom-ref": "crypto-aes-gcm",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "block-cipher",
+          "parameterSetIdentifier": "256",
+          "mode": "gcm",
+          "classicalSecurityLevel": 256,
+          "cryptoFunctions": ["authenticated-encrypt", "authenticated-decrypt"]
+        },
+        "detectionContext": {
+          "filePath": "payment_gateway/crypto.go",
+          "line": 34
+        },
+        "vulnerabilities": ["Reused static 12-byte nonce (GHASH forgery)"]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "DES",
+      "bom-ref": "crypto-des",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "block-cipher",
+          "parameterSetIdentifier": "56",
+          "mode": "cbc",
+          "classicalSecurityLevel": 56,
+          "cryptoFunctions": ["encrypt", "decrypt"]
+        },
+        "detectionContext": {
+          "filePath": "payment_gateway/crypto.go",
+          "line": 40
+        },
+        "vulnerabilities": ["Exhaustive key search / brute force", "Small 64-bit block size (Sweet32)"]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "RSA-1024",
+      "bom-ref": "crypto-rsa-1024",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "signature",
+          "parameterSetIdentifier": "1024",
+          "classicalSecurityLevel": 80,
+          "cryptoFunctions": ["sign", "verify"]
+        },
+        "detectionContext": {
+          "filePath": "token_vault/signer.js",
+          "line": 9
+        },
+        "vulnerabilities": ["Insufficient key length (< 2048-bit)", "Low public exponent e=3", "Quantum-vulnerable"]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "RC4",
+      "bom-ref": "crypto-rc4",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": {
+          "primitive": "stream-cipher",
+          "parameterSetIdentifier": "128",
+          "classicalSecurityLevel": 0,
+          "cryptoFunctions": ["encrypt", "decrypt"]
+        },
+        "detectionContext": {
+          "filePath": "token_vault/signer.js",
+          "line": 36
+        },
+        "vulnerabilities": ["Biased keystream bytes (RFC 7465 prohibited)"]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "TLSv1.0-TLSv1.1",
+      "bom-ref": "crypto-protocol-tlsv1",
+      "cryptoProperties": {
+        "assetType": "protocol",
+        "protocolProperties": {
+          "type": "tls",
+          "version": "1.0, 1.1",
+          "cipherSuites": ["RC4-MD5", "RC4-SHA", "DES-CBC3-SHA"]
+        },
+        "detectionContext": {
+          "filePath": "tls_config/nginx_crypto.conf",
+          "line": 13
+        },
+        "vulnerabilities": ["Deprecated protocols (RFC 8996)", "BEAST / POODLE attacks"]
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "name": "X509-Certificate-RSA1024",
+      "bom-ref": "crypto-cert-legacy-gateway",
+      "cryptoProperties": {
+        "assetType": "certificate",
+        "certificateProperties": {
+          "subject": "CN=legacy-gateway.fintech.corp",
+          "signatureAlgorithmRef": "sha256WithRSAEncryption",
+          "publicKeyAlgorithm": "RSA",
+          "keyLength": 1024
+        },
+        "detectionContext": {
+          "filePath": "certs/legacy_gateway.crt",
+          "line": 1
+        },
+        "vulnerabilities": ["Weak 1024-bit RSA key modulus"]
+      }
+    }
+  ]
+}
