@@ -1,0 +1,35 @@
+services:
+  target1:
+    build: ./target1
+    container_name: ctf-egress-target1
+    cap_add:
+      - NET_ADMIN
+    networks:
+      dmz_net_ef:
+        ipv4_address: 172.27.0.10
+      internal_net_ef:
+        ipv4_address: 172.28.0.10
+    ports:
+      - "8085:8085"
+    restart: unless-stopped
+
+  target2:
+    build: ./target2
+    container_name: ctf-egress-target2
+    networks:
+      internal_net_ef:
+        ipv4_address: 172.28.0.20
+    restart: unless-stopped
+
+networks:
+  dmz_net_ef:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.27.0.0/24
+  internal_net_ef:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
