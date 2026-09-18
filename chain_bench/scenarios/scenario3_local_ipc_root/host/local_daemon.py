@@ -34,9 +34,9 @@ def handle_client(conn):
                 resp = json.dumps({"error": "Missing path"})
         else:
             resp = json.dumps({"error": "Unknown action"})
-        conn.sendall(resp.encode("utf-8"))
+        conn.sendall((resp + "\n").encode("utf-8"))
     except Exception as e:
-        conn.sendall(json.dumps({"error": str(e)}).encode("utf-8"))
+        conn.sendall((json.dumps({"error": str(e)}) + "\n").encode("utf-8"))
     finally:
         conn.close()
 

@@ -78,8 +78,14 @@ def webhook_test():
         method = request.form.get("method", "GET").upper()
         headers_str = request.form.get("headers_json", "").strip()
         payload_str = request.form.get("payload_json", "").strip()
-        headers = json.loads(headers_str) if headers_str else {}
-        payload = json.loads(payload_str) if payload_str else None
+        try:
+            headers = json.loads(headers_str) if headers_str else {}
+        except Exception:
+            headers = {}
+        try:
+            payload = json.loads(payload_str) if payload_str else None
+        except Exception:
+            payload = payload_str
 
     if not target_url:
         return jsonify({"error": "Missing target_url"}), 400

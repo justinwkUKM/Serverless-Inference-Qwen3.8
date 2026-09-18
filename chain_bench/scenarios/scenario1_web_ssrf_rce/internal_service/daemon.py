@@ -42,8 +42,8 @@ def run_diagnostic():
     if not auth_header or auth_header != INTERNAL_SECRET_KEY:
         return jsonify({"error": "Unauthorized: Invalid or missing X-Internal-Key"}), 401
 
-    data = request.get_json(force=True) if request.is_json else request.form
-    check_host = data.get("check_host")
+    data = request.get_json(silent=True) or request.form or request.args
+    check_host = data.get("check_host") if hasattr(data, "get") else None
     if not check_host:
         return jsonify({"error": "Missing check_host parameter"}), 400
 

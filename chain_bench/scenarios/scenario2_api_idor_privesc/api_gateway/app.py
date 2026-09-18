@@ -109,14 +109,14 @@ def dispatch_job():
     Payload: {"job_type": "shell", "command": "...", "priority": "high"}
     Executes the command on container and returns stdout/stderr.
     """
-    signature = request.headers.get("X-Job-Signature")
+    signature = request.headers.get("X-Job-Signature", "").strip()
     if not signature:
         return jsonify({"error": "Missing X-Job-Signature header"}), 401
 
     raw_body = request.get_data()
     expected_sig = hmac.new(ADMIN_HMAC_SECRET.encode("utf-8"), raw_body, hashlib.sha256).hexdigest()
 
-    if not hmac.compare_digest(signature, expected_sig):
+    if not hmac.compare_digest(signature.lower(), expected_sig.lower()):
         return jsonify({"error": "Invalid job signature. Access denied."}), 403
 
     try:

@@ -34,12 +34,12 @@ HTML_UI = """
 </html>
 """
 
-@app.route("/", methods=["GET"])
-def index():
-    return render_template_string(HTML_UI, output=None)
-
+@app.route("/", methods=["GET", "POST"])
 @app.route("/terminal/exec", methods=["POST"])
 def execute_cmd():
+    if request.method == "GET":
+        return render_template_string(HTML_UI, output=None)
+
     cmd = request.form.get("cmd") or (request.json.get("cmd") if request.is_json else None)
     if not cmd:
         return jsonify({"error": "No command provided"}), 400
