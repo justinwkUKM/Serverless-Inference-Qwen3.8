@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  host_node:
+    build: ./host
+    container_name: chainbench_scenario3_host
+    ports:
+      - "8097:8000"
+    restart: always
