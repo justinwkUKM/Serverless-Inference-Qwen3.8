@@ -1,0 +1,36 @@
+version: '3.8'
+
+networks:
+  public_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.32.0.0/24
+  internal_net:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.33.0.0/24
+
+services:
+  gateway_service:
+    build: ./gateway
+    container_name: chainbench_scenario1_gateway
+    networks:
+      public_net:
+        ipv4_address: 172.32.0.10
+      internal_net:
+        ipv4_address: 172.33.0.10
+    ports:
+      - "8095:8000"
+    restart: always
+
+  internal_service:
+    build: ./internal_service
+    container_name: chainbench_scenario1_internal
+    networks:
+      internal_net:
+        ipv4_address: 172.33.0.20
+    # No ports exposed to host machine
+    restart: always
