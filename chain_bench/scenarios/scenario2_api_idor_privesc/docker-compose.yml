@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  api_gateway:
+    build: ./api_gateway
+    container_name: chainbench_scenario2_gateway
+    ports:
+      - "8096:8000"
+    restart: always
