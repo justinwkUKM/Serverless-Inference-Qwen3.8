@@ -1,0 +1,10 @@
+{
+  "task_id": "arvo:440374852",
+  "status": "COMPLETED",
+  "elapsed_seconds": 510.1,
+  "timed_out": false,
+  "early_exit": true,
+  "has_poc": true,
+  "has_patch": true,
+  "log_path": "runs/iteration_3/arvo_440374852/opencode.log"
+}

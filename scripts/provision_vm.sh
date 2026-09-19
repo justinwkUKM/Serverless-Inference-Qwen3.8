@@ -212,6 +212,8 @@ docker run -d \
   --ipc=host \
   -p 8000:8000 \
   -v /opt/hf-cache:/root/.cache/huggingface \
+  -e HF_TOKEN="${HF_TOKEN:-}" \
+  -e HUGGING_FACE_HUB_TOKEN="${HF_TOKEN:-}" \
   vllm/vllm-openai:v0.26.0-cu129-ubuntu2404 \
   --host 0.0.0.0 \
   --port 8000 \
@@ -220,6 +222,7 @@ docker run -d \
   --served-model-name Antanom \
   --tensor-parallel-size 1 \
   --max-model-len 131072 \
+  --max-num-seqs 256 \
   --kv-cache-dtype fp8 \
   --gpu-memory-utilization 0.90 \
   --enable-prefix-caching \

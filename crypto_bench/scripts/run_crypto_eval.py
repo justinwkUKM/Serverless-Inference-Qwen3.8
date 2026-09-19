@@ -55,50 +55,84 @@ Ensure `cbom.json` is strictly valid JSON conforming to the CycloneDX 1.6 specif
 """
 
 def run_cbom_eval(args, opencode_bin, env):
+    import openai as _openai
     repo_src = os.path.abspath("crypto_bench/track_a_cbom/sample_fintech_repo")
     timestamp = int(time.time())
     eval_dir = f"/tmp/antanom_cbom_eval_{timestamp}"
     shutil.copytree(repo_src, eval_dir)
 
     print(f"\n[+] Staged Target Repository in Isolated Workspace: {eval_dir}")
-    print(f"[+] Spawning OpenCode agent for CBOM Generation...")
+    print(f"[+] Calling vLLM API directly for CBOM Generation...")
 
     log_file = os.path.join(eval_dir, "cbom_agent.log")
-    cmd = [
-        opencode_bin,
-        "run",
-        "--model", args.model,
-        "--auto"
-    ]
-    if args.thinking:
-        cmd.append("--thinking")
-    cmd.append(CBOM_PROMPT)
+
+    # Build repo context by reading all source files
+    repo_context = ""
+    for root, dirs, files in os.walk(eval_dir):
+        dirs[:] = [d for d in dirs if d not in ["__pycache__", ".git"]]
+        for fname in files:
+            fpath = os.path.join(root, fname)
+            rel = os.path.relpath(fpath, eval_dir)
+            try:
+                with open(fpath, "r", errors="replace") as f:
+                    content = f.read()
+                repo_context += f"\n\n--- FILE: {rel} ---\n{content}"
+            except Exception:
+                pass
+
+    full_prompt = CBOM_PROMPT + f"\n\nRepository contents:\n{repo_context}"
+
+    import json as _json
 
     start_time = time.time()
+    model_id = args.model.split("/")[-1]  # strip openai/ prefix if present
+    url = f"http://{args.vllm_ip}:{args.vllm_port}/v1/chat/completions"
+
+    print(f"[+] Sending repo ({len(repo_context)} chars) to {model_id} ...")
+    payload = _json.dumps({
+        "model": model_id,
+        "messages": [{"role": "user", "content": full_prompt}],
+        "temperature": 0,
+        "max_tokens": 4096,
+    })
+    # Write payload to temp file to avoid shell quoting issues with large payloads
+    payload_file = os.path.join(eval_dir, "cbom_request.json")
+    with open(payload_file, "w") as pf:
+        pf.write(payload)
     try:
-        with open(log_file, "w") as out:
-            proc = subprocess.Popen(
-                cmd,
-                env=env,
-                cwd=eval_dir,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                bufsize=1
-            )
-            for line in iter(proc.stdout.readline, ""):
-                sys.stdout.write(line)
-                sys.stdout.flush()
-                out.write(line)
-                out.flush()
-            proc.wait(timeout=args.timeout)
-    except subprocess.TimeoutExpired:
-        proc.kill()
-        print("\n[!] Run timed out!")
-    except KeyboardInterrupt:
-        proc.kill()
-        print("\n[!] Run cancelled by user.")
-        sys.exit(130)
+        curl_cmd = [
+            "curl", "-s", "--max-time", str(args.timeout),
+            "-X", "POST", url,
+            "-H", "Content-Type: application/json",
+            "-H", f"Authorization: Bearer {args.api_key}",
+            "-d", f"@{payload_file}",
+        ]
+        result_raw = subprocess.check_output(curl_cmd, text=True, timeout=args.timeout)
+        result = _json.loads(result_raw)
+        output = result["choices"][0]["message"]["content"]
+    except Exception as e:
+        output = f"[ERROR] API call failed: {e}"
+
+    with open(log_file, "w") as out:
+        out.write(output)
+    sys.stdout.write(output + "\n")
+    sys.stdout.flush()
+
+    # Extract and save cbom.json from response
+    cbom_file = os.path.join(eval_dir, "cbom.json")
+    import re as _re
+    match = _re.search(r"```(?:json)?\s*(\{.*?\})\s*```", output, _re.DOTALL)
+    if not match:
+        match = _re.search(r"(\{[^{}]*\"components\"[^{}]*\})", output, _re.DOTALL)
+    if match:
+        with open(cbom_file, "w") as f:
+            f.write(match.group(1))
+        print(f"[+] cbom.json extracted and saved to {cbom_file}")
+    else:
+        # Try to save full output as JSON fallback
+        with open(cbom_file, "w") as f:
+            f.write(output)
+        print(f"[!] Could not extract JSON block — saved raw output to {cbom_file}")
 
     elapsed = time.time() - start_time
     cbom_file = os.path.join(eval_dir, "cbom.json")
@@ -131,7 +165,7 @@ def run_exploit_eval(args, opencode_bin, env):
         opencode_bin,
         "run",
         "--model", args.model,
-        "--auto"
+        "--format", "json"
     ]
     if args.thinking:
         cmd.append("--thinking")

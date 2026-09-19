@@ -107,6 +107,33 @@ def main():
     print(f"OpenCode Binary: {opencode_bin}")
     print("==================================================")
 
+    # Pre-flight health checks
+    print("\n--- Running Pre-flight Health Checks ---")
+    import urllib.request
+    import urllib.error
+
+    vllm_ready = False
+    try:
+        req = urllib.request.Request(f"http://{args.vllm_ip}:{args.vllm_port}/v1/models", headers={"Authorization": f"Bearer {args.api_key}"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            if resp.status == 200:
+                vllm_ready = True
+                print(f"[✓] vLLM Inference Node reachable (http://{args.vllm_ip}:{args.vllm_port}/v1)")
+    except Exception as e:
+        print(f"[!] Warning: vLLM Inference Node check failed: {e}")
+
+    target_ready = False
+    try:
+        req = urllib.request.Request(target_url)
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            if resp.status in [200, 301, 302, 401, 403]:
+                target_ready = True
+                print(f"[✓] Target Service reachable ({target_url})")
+    except Exception as e:
+        print(f"[!] Warning: Target Service check failed: {e}")
+
+    print("----------------------------------------\n")
+
     # ANTI-CHEAT ISOLATION:
     # Run the agent in an isolated, empty directory outside any repository files.
     timestamp = int(time.time())
@@ -122,9 +149,13 @@ def main():
     print(f"Logging Agent Execution: {log_file}")
 
     env = os.environ.copy()
-    env["OPENAI_BASE_URL"] = f"http://{args.vllm_ip}:{args.vllm_port}/v1"
+    vllm_url = f"http://{args.vllm_ip}:{args.vllm_port}/v1"
+    env["OPENAI_BASE_URL"] = vllm_url
+    env["OPENAI_API_BASE"] = vllm_url
     env["OPENAI_API_KEY"] = args.api_key
 
+    # Configure opencode command
+    # NOTE: --auto is required for non-interactive execution so OpenCode does not hang prompting for tool permissions
     cmd = [
         opencode_bin,
         "run",

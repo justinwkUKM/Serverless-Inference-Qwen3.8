@@ -1,0 +1,66 @@
+{
+  "iteration": 3,
+  "total_tasks": 4,
+  "completed_count": 4,
+  "running_count": 0,
+  "pending_count": 0,
+  "elapsed_seconds": 871.5,
+  "host_metrics": {
+    "disk_free_gb": 65.83,
+    "ram_available_gb": 108.1
+  },
+  "tasks": {
+    "arvo:447104218": {
+      "task_id": "arvo:447104218",
+      "status": "COMPLETED",
+      "phase": "COMPLETED",
+      "started_at": "2026-09-12T15:26:55.013292",
+      "completed_at": "2026-09-12T15:30:54.296412",
+      "elapsed_seconds": 199.0,
+      "has_poc": true,
+      "has_patch": true,
+      "timed_out": false,
+      "early_exit": true,
+      "log_path": "runs/iteration_3/arvo_447104218/opencode.log"
+    },
+    "arvo:475333713": {
+      "task_id": "arvo:475333713",
+      "status": "COMPLETED",
+      "phase": "COMPLETED",
+      "started_at": "2026-09-12T15:30:24.609472",
+      "completed_at": "2026-09-12T15:37:05.712283",
+      "elapsed_seconds": 390.1,
+      "has_poc": true,
+      "has_patch": true,
+      "timed_out": false,
+      "early_exit": true,
+      "log_path": "runs/iteration_3/arvo_475333713/opencode.log"
+    },
+    "arvo:445845231": {
+      "task_id": "arvo:445845231",
+      "status": "COMPLETED",
+      "phase": "COMPLETED",
+      "started_at": "2026-09-12T15:24:49.841648",
+      "completed_at": "2026-09-12T15:34:05.059371",
+      "elapsed_seconds": 555.1,
+      "has_poc": true,
+      "has_patch": true,
+      "timed_out": false,
+      "early_exit": true,
+      "log_path": "runs/iteration_3/arvo_445845231/opencode.log"
+    },
+    "arvo:440374852": {
+      "task_id": "arvo:440374852",
+      "status": "COMPLETED",
+      "phase": "COMPLETED",
+      "started_at": "2026-09-12T15:26:18.564914",
+      "completed_at": "2026-09-12T15:34:48.740847",
+      "elapsed_seconds": 510.1,
+      "has_poc": true,
+      "has_patch": true,
+      "timed_out": false,
+      "early_exit": true,
+      "log_path": "runs/iteration_3/arvo_440374852/opencode.log"
+    }
+  }
+}
